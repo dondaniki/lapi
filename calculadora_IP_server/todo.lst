@@ -1,11 +1,11 @@
-todo: pasar argumentos ( tcp/udp/ip destino/ip origen/sentencia/verbose/... )
+check: pasar argumentos ( tcp/udp/ip destino/ip origen/sentencia/verbose/... )
 todo: informar del origien y el destino de las comunicaciones (-v)
 todo: hacer control de los posibles fallos e informar de ello ordenadamente (-v)
-todo: hacer una verificacion de los tipos de datos a trabajar ( reglas y lenguaje del protocolo)
-todo: refactorizar
+check: hacer una verificacion de los tipos de datos a trabajar ( reglas y lenguaje del protocolo)
+check: refactorizar
 todo: timeout en cliente (tcp/udp)
 todo: conexiones tcp vs udp ( verificar los fallos )
 todo: timeout en server ( evitar conexiones vacias )
 todo: servidor tcp multicliente
-todo: control de errores de conexion
-todo: en tcp, poner mensaje de fin de mensaje ( opcional, no especificado en protocolo )
+check: control de errores de conexion
+N/A: en tcp, poner mensaje de fin de mensaje ( opcional, no especificado en protocolo )
