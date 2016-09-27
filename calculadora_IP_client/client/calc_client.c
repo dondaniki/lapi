@@ -1,35 +1,27 @@
 #include "calculadora.h"
 
-struct sockaddr_in dirServ;
+struct sockaddr_in sock_srv;
 char mensajeEnv[100];
 char mensajeRec[200];
 
-char operando[3];
-char solucion[3];
+char problem_to_send[3];
+char server_solution[3];
 
 int rec;
-int s;
-
-
+int local_socket;
 
 char ipstr[INET6_ADDRSTRLEN];
 
-
-
-
-
-main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
 	int udp_flag = 0;
 	int tcp_flag = 0;
-	int multi_flag = 0;
+	//int multi_flag = 0;
 	int port_number = 7777;
-	char *pvalue = NULL;
-	char *pcalc = NULL;
-	char *pserv = NULL;
-	int index;
+	char *rem_port_val = NULL;
+	char *server_ip_addr = NULL;
+	char *problem_2_solve = NULL;
+	//int index;
 	int c;
-
-
 
 	if (argc == 1) {
 
@@ -49,13 +41,13 @@ main(int argc, char *argv[]) {
 			udp_flag = 1;
 			break;
 		case 'p':
-			pvalue = optarg;
+			rem_port_val = optarg;
 			break;
 		case 's':
-			pserv = optarg;
+			server_ip_addr = optarg;
 			break;
 		case 'o':
-			pcalc = optarg;
+			problem_2_solve = optarg;
 			break;
 		default:
 			printf(
@@ -64,17 +56,15 @@ main(int argc, char *argv[]) {
 			exit(1);
 		}
 
-	// if ( isdigit(atoi(pvalue)))
-
-	if (pvalue != NULL) {
-		int length = strlen(pvalue);
+	if (rem_port_val != NULL) {
+		int length = strlen(rem_port_val);
 		for (int i = 0; i < length; i++)
-			if (!isdigit(pvalue[i])) {
+			if (!isdigit(rem_port_val[i])) {
 				printf("Entered port is not a number\n");
 				exit(1);
 			}
 
-		port_number = atoi(pvalue);
+		port_number = atoi(rem_port_val);
 
 		if (!((port_number > 1024) && (port_number < 65535))) {
 			printf("puerto fuera de rango\n");
@@ -90,17 +80,17 @@ main(int argc, char *argv[]) {
 		tcp_flag = 1;
 	}
 
-	if (pcalc == NULL) {
+	if (problem_2_solve == NULL) {
 		printf("debe escribir una operacion segun protocolo\n");
 		exit(1);
 	}
 
-	if ((pserv == NULL)) {
+	if ((server_ip_addr == NULL)) {
 		printf("debe escribir una ip del servidor\n");
 		exit(1);
 	} else {
 		struct in_addr addr;
-		if (inet_aton(pserv, &addr) == 0) {
+		if (inet_aton(server_ip_addr, &addr) == 0) {
 			fprintf(stderr, "Invalid IP address\n");
 			exit(EXIT_FAILURE);
 		}
@@ -109,100 +99,84 @@ main(int argc, char *argv[]) {
 
 	printf("udp_flag = %d, tcp_flag = %d\n", udp_flag, tcp_flag);
 	printf("port_number = %d\n", port_number);
-	if (pcalc != NULL)
-		printf("operacion = %s\n", pcalc);
-	if (pserv != NULL)
-		printf("ip = %s\n", pserv);
+	if (problem_2_solve != NULL)
+		printf("operacion = %s\n", problem_2_solve);
+	if (server_ip_addr != NULL)
+		printf("ip = %s\n", server_ip_addr);
 
 	//return 0;
 
 	if (tcp_flag) {
-		s = socket(AF_INET, SOCK_STREAM, 0);
+		local_socket = socket(AF_INET, SOCK_STREAM, 0);
 
 	} else {
 
-		s = socket(AF_INET, SOCK_DGRAM, 0);
+		local_socket = socket(AF_INET, SOCK_DGRAM, 0);
 
 	}
-	dirServ.sin_family = AF_INET;
-	dirServ.sin_addr.s_addr = inet_addr(pserv);
-	dirServ.sin_port = htons(port_number);
+	sock_srv.sin_family = AF_INET;
+	sock_srv.sin_addr.s_addr = inet_addr(server_ip_addr);
+	sock_srv.sin_port = htons(port_number);
 
-	if (tcp_flag)
-	{
+	if (tcp_flag) {
 		socklen_t len;
 		struct sockaddr_storage addr;
 		int port;
 
-		len = sizeof dirServ;
-		getpeername(s, (struct sockaddr*) &dirServ, &len);
+		len = sizeof sock_srv;
+		getpeername(local_socket, (struct sockaddr*) &sock_srv, &len);
 
 		// deal with both IPv4 and IPv6:
-		if (dirServ.sin_family == AF_INET) {
-			struct sockaddr_in *s = (struct sockaddr_in *) &dirServ;
-			port = ntohs(s->sin_port);
-			inet_ntop(AF_INET, &s->sin_addr, ipstr, sizeof ipstr);
+		if (sock_srv.sin_family == AF_INET) {
+			struct sockaddr_in *local_socket = (struct sockaddr_in *) &sock_srv;
+			port = ntohs(local_socket->sin_port);
+			inet_ntop(AF_INET, &local_socket->sin_addr, ipstr, sizeof ipstr);
 		} else { // AF_INET6
-			struct sockaddr_in6 *s = (struct sockaddr_in6 *) &addr;
-			port = ntohs(s->sin6_port);
-			inet_ntop(AF_INET6, &s->sin6_addr, ipstr, sizeof ipstr);
+			struct sockaddr_in6 *local_socket = (struct sockaddr_in6 *) &addr;
+			port = ntohs(local_socket->sin6_port);
+			inet_ntop(AF_INET6, &local_socket->sin6_addr, ipstr, sizeof ipstr);
 		}
 
-		if (connect(s, &dirServ, sizeof(dirServ)) != 0 )
-		{
-
+		if (connect(local_socket, &sock_srv, sizeof(sock_srv)) != 0) {
 
 			perror("fallo en connect");
 			printf("no se puede conectar contra %s\n", ipstr);
-			exit (-1) ;
-		}
-		else
-		{
-
+			exit(-1);
+		} else {
 
 			printf("Peer IP address: %s\n", ipstr);
 		}
 	}
 
-	//strcpy (mensajeEnv,"hola amigo");
-	//operando[0]='+';
-	//operando[0]='-';
-	//operando[0]='*';
-	//operando[0] = '/';
-	//operando[1] = '3';
-	//operando[2] = '8';
-
-	bzero(operando,sizeof(operando));
-	memcpy(operando, pcalc, sizeof(pcalc));
+	bzero(problem_to_send, sizeof(problem_to_send));
+	memcpy(problem_to_send, problem_2_solve, sizeof(problem_2_solve));
 
 	if (tcp_flag) {
-		int n = write(s, operando, strlen(operando));
-		if( n<0 )
-		{
+		int n = write(local_socket, problem_to_send, strlen(problem_to_send));
+		if (n < 0) {
 			perror("fallo en tcp write\n");
-			exit( -1);
+			exit(-1);
 		}
 	} else {
-		//sendto (s,mensajeEnv,strlen(mensajeEnv),0,&dirServ,sizeof(dirServ));
-		sendto(s, operando, strlen(operando), 0, &dirServ, sizeof(dirServ));
+
+		sendto(local_socket, problem_to_send, strlen(problem_to_send), 0, &sock_srv, sizeof(sock_srv));
 	}
 
 	if (tcp_flag) {
-		//int tot = strlen(operando);
+
 		int tot = (sizeof(char) * 2);
 		int n = 0;
 		while (n < tot) {
-			rec = read(s, solucion + n, tot - n);
-			//rec = read(s, solucion, tot - n);
+			rec = read(local_socket, server_solution + n, tot - n);
 			n += rec;
 		}
 	} else {
 
-		int tam = sizeof(dirServ);
-		rec = recvfrom(s, solucion, sizeof(solucion), 0, &dirServ, &tam);
+		int tam = sizeof(sock_srv);
+		rec = recvfrom(local_socket, server_solution, sizeof(server_solution), 0, &sock_srv, &tam);
 	}
 
 	mensajeRec[rec] = '\0';
-	printf("recibido :%s:\n", solucion);
+	printf("recibido :%s:\n", server_solution);
 
 }
