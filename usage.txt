@@ -1,0 +1,13 @@
+Usage: calculadora_IP_client [-u|-t] [ -p port ] -s server -o operacion
+
+selecciona protocolo -u (udp) o -t (tcp)[*]
+selecciona puerto -p port [7777][*]
+
+
+
+Usage: calculadora_IP_server [-u|-t] [ -p port ]
+
+selecciona protocolo -u (udp) o -t (tcp)[*]
+selecciona puerto -p port [7777][*]
+
+[*] opcion por defectos
