@@ -8,7 +8,7 @@ verifica_mensaje (char * msg_2_check, char ** sol)
   unsigned short int error = 0;
   char solucion[3];
 
-  if (msg_2_check == NULL)
+  if (msg_2_check == NULL || msg_2_check[0] == '\0')
     return -1;
   if (sol == NULL)
     return -1;

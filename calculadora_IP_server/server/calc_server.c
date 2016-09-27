@@ -125,7 +125,7 @@ main (int argc, char *argv[])
 
   if(tcp_flag)
     {
-      listen(s,5);
+      listen(s,2);
     }
 
 
@@ -140,11 +140,20 @@ main (int argc, char *argv[])
       if (tcp_flag)
 	{
 	  sconn= accept (s,&dirCli,&tam);
-	  int n= read (sconn,operacion_a_realizar,sizeof(operacion_a_realizar));
-	  while ( n>0 ) {
-	  //write (sconn,operacion_a_realizar,n);
-	  n= read (sconn,operacion_a_realizar,sizeof(operacion_a_realizar));
+
+	  rec= read (sconn,operacion_a_realizar,sizeof(operacion_a_realizar));
+//	  while (rec != 0){
+////	  }
+
+	  if(rec==0)
+	  {
+		  perror("tcp server read: zero bytes");
 	  }
+
+	 // while ( n>0 ) {
+	  //write (sconn,operacion_a_realizar,n);
+	  //n= read (sconn,operacion_a_realizar,sizeof(operacion_a_realizar));
+	  //}
 	  //close (sconn);
 	}
       else
@@ -156,6 +165,8 @@ main (int argc, char *argv[])
 
       operacion_a_realizar[rec] = '\0';
       printf ("recibido server:%s:\n", operacion_a_realizar);
+
+
 
      if ( verifica_mensaje (operacion_a_realizar, &mensaje_verificado) == 0 )
        {
@@ -178,10 +189,16 @@ main (int argc, char *argv[])
 
       if (tcp_flag)
 	{
-	      write(sconn,solucion,sizeof(solucion));
+	      if (write(sconn,solucion,sizeof(solucion))<0)
+	      {
+	    	  perror("tcp server fallo write");
+	      }
+
 	      close(sconn);
 
 	      close(s);
+
+	      sconn=-1;
 	}
       else
 
