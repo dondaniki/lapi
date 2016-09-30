@@ -23,19 +23,19 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: calculadora_IP_server
+all: calculadora_IP_Server
 
 # Tool invocations
-calculadora_IP_server: $(OBJS) $(USER_OBJS)
+calculadora_IP_Server: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc  -o "calculadora_IP_server" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc  -o "calculadora_IP_Server" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) calculadora_IP_server
+	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) calculadora_IP_Server
 	-@echo ' '
 
 .PHONY: all clean dependents
