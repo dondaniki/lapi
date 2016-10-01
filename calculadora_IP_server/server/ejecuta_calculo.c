@@ -41,9 +41,12 @@ int ejecuta_calculo(char * msg_2_compute, char ** sol) {
 		printf("%d\n", resultado_parcial);
 		break;
 	case '/':
-		resultado_parcial = (operando1) / (operando2);
-		printf("%d\n", resultado_parcial);
-		break;
+		if (operando2 != 0 )
+		{
+			resultado_parcial = (operando1) / (operando2);
+			printf("%d\n", resultado_parcial);
+			break;
+		}
 	default:
 		solucion[0] = 'N';
 		solucion[1] = 'O';
