@@ -7,7 +7,7 @@
 
 #include "calculadora.h"
 
-int ejecuta_calculo(char * msg_2_compute, char ** sol) {
+int ejecuta_calculo(char * msg_2_compute, char * sol) {
 	char operador, operando1, operando2;
 	int resultado_parcial = 0;
 	char solucion[2];

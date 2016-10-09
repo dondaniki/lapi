@@ -10,11 +10,13 @@ char solucion[2];
 
 int rec;
 int sock_srv;
+#define CLIENT_MAX=1024;
+
 
 int main(int argc, char *argv[]) {
 	int udp_flag = 0;
 	int tcp_flag = 0;
-	//int multi_flag = 0;
+	int numero_clientes=0;
 	int port_number = 7777;
 	char *port_arg_value = NULL;
 
@@ -104,11 +106,15 @@ int main(int argc, char *argv[]) {
 	}
 
 	while (1) {
+
+
+
+
 		bzero(&client_addr, sizeof(client_addr));
 		int tam = sizeof(client_addr);
 		int socket_efimero;
 retorno_fallo_accept:
-retorno_fallo_read_zero:
+retorno_task_server:
 
 		if (tcp_flag) {
 			socket_efimero = accept(sock_srv, &client_addr, &tam);
@@ -120,46 +126,21 @@ retorno_fallo_read_zero:
 				goto retorno_fallo_accept;
 			}
 
-			rec = read(socket_efimero, operacion_a_realizar,
-					sizeof(operacion_a_realizar));
-
-			if (rec <= 0) {
-				perror("tcp server read: zero bytes");
-				//exit(-1);
-				goto retorno_fallo_read_zero;
-			}
-
-		} else {
-			rec = recvfrom(sock_srv, operacion_a_realizar,
-					sizeof(operacion_a_realizar), 0, &client_addr, &tam);
-
-		}
-
-
-
-		operacion_a_realizar[rec] = '\0';
-		printf("recibido server:%s:\n", operacion_a_realizar);
-
-		if (verifica_mensaje(operacion_a_realizar, &mensaje_verificado) == 0) {
-			ejecuta_calculo(mensaje_verificado, &solucion);
-		} else {
-			solucion[0] = 'N';
-			solucion[1] = 'O';
-
-		}
-
-
-		if (tcp_flag) {
-			if (write(socket_efimero, solucion, sizeof(solucion)) < 0) {
-				perror("tcp server fallo write");
-			}
-
+			if ( task_server_tcp(socket_efimero) == -1 )
+				goto retorno_task_server;
 			close(socket_efimero);
-		} else
 
-		{
-			sendto(sock_srv, solucion, sizeof(solucion), 0, &client_addr, sizeof(client_addr));
+		} else {
+
+			if (task_server_udp(sock_srv) == -1 )
+					goto retorno_task_server;
+
 		}
+
 	}
 	close(sock_srv);
+
+
+
+
 }

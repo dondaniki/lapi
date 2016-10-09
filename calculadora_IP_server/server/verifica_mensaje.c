@@ -1,6 +1,6 @@
 #include "calculadora.h"
 
-int verifica_mensaje(char * msg_2_check, char ** sol) {
+int verifica_mensaje(char * msg_2_check, char * sol) {
 	char operador, operando1, operando2;
 	int resultado_parcial = 0;
 	unsigned short int error = 0;
