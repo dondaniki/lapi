@@ -10,17 +10,29 @@ int numero_clientes = 0;
 
 int rec;
 int sock_srv;
-#define CLIENT_MAX=1024;
-
+//#define CLIENT_MAX=1024;
+pthread_mutex_t lock;
 
 
 
 void catchHijo() {
-	while (wait3(NULL, WNOHANG, NULL) > 0) {
-		numero_clientes--;
-	}
-}
+	//while (wait3(NULL, WNOHANG, NULL) > 0) {
+/*	pthread_mutex_lock(&lock);
 
+	numero_clientes--;
+
+	pthread_mutex_unlock(&lock);*/
+
+	printf("he pillado a un hijo muriendose \n");
+	while (waitpid(-1, NULL, WNOHANG) > 0) {
+		pthread_mutex_lock(&lock);
+
+		numero_clientes--;
+
+		pthread_mutex_unlock(&lock);
+	}
+
+}
 
 int main(int argc, char *argv[]) {
 	int udp_flag = 0;
@@ -109,10 +121,20 @@ int main(int argc, char *argv[]) {
 	}
 
 	if (tcp_flag) {
+		struct sigaction act;
 
-		signal (SIGCHLD,catchHijo);
+		memset (&act, 0, sizeof(act));
+		act.sa_handler = catchHijo;
+
+		if (sigaction(SIGCHLD, &act, 0)) {
+			perror ("sigaction");
+			return 1;
+		}
+
 		listen(sock_srv, 2);
 	}
+
+	//signal (SIGCHLD,catchHijo);
 
 	while (1) {
 
@@ -140,6 +162,8 @@ retorno_task_server:
 
 				goto retorno_fallo_accept;
 			}
+			signal (SIGCHLD,catchHijo);
+			signal (SIGKILL,catchHijo);
 
 			if (numero_clientes < MAX_HIJOS) {
 
@@ -153,7 +177,7 @@ retorno_task_server:
 
 					close(socket_efimero);
 
-					exit(1);
+					exit(0);
 
 				} else {
 					//soy tu padre
@@ -163,14 +187,6 @@ retorno_task_server:
 
 				}
 			}
-
-			//if (task_server_tcp(socket_efimero) == -1)
-				//goto retorno_task_server;
-			//close(socket_efimero);
-
-
-
-
 
 
 		} else {

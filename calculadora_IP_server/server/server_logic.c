@@ -21,5 +21,5 @@ void do_server_logic(char* operacion_a_realizar, int rec,
 	}
 	//return solucion;
 
-	sleep(1);
+	//sleep(1);
 }

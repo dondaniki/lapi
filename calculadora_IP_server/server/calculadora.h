@@ -23,11 +23,17 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <errno.h>
+#include <signal.h>
+#include <stdio.h>
+#include <sys/resource.h>
+#include <string.h>
+#include<pthread.h>
+
 
 #define SOL_SIZE  2
 #define MES_LEN 3
 #define OP_LEN 4
-#define MAX_HIJOS 150
+#define MAX_HIJOS 500
 
 
 int ejecuta_calculo (char * msg_2_compute, char * sol);

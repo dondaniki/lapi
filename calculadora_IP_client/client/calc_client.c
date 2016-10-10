@@ -179,4 +179,5 @@ int main(int argc, char *argv[]) {
 	mensajeRec[rec] = '\0';
 	printf("recibido :%s:\n", server_solution);
 
+	return 0;
 }
