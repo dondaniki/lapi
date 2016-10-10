@@ -20,4 +20,6 @@ void do_server_logic(char* operacion_a_realizar, int rec,
 		solucion[1] = 'O';
 	}
 	//return solucion;
+
+	sleep(1);
 }
